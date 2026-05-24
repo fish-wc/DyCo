@@ -1,0 +1,5 @@
+【{agent_id}的分析】
+{analyses}
+
+【{agent_id}的性格】
+{personality}

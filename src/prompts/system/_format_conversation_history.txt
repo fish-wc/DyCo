@@ -1,0 +1,9 @@
+【{sender_id}的发言记录】
+**发言团队**: {team_id}
+**发言时间**: {times}, 
+**类型**: {message_type}
+**发言所属阶段**: {round_stage}
+**发言内容**：
+{content}
+
+---
