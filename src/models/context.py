@@ -276,7 +276,7 @@ class AgentActionContext(BaseContext):
     # Agent信息
     agent_id: str = Field(..., description="Agent ID")
     agent_name: str = Field(..., description="Agent名称")
-    mbti_type: Optional[str] = Field(None, description="MBTI类型")
+    mbti_type: Optional[str] = Field(None, description="角色先验标签(MBTI测试床)")
     
     # 行动信息
     action_type: str = Field(..., description="行动类型: analyze_task/evaluate_solution/decide_team_preference/speak/generate等")

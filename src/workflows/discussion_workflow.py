@@ -6,6 +6,7 @@ import json
 import logging
 import random
 import inspect
+import numpy as np
 from datetime import datetime
 
 from ..models.message import RoundStage, MessageType
@@ -140,7 +141,7 @@ class FourRoundDiscussionWorkflow:
             self.logger.info(f"✓ 已设置任务到讨论摘要管理器")
             
             self.logger.debug("="*80)
-            self.logger.info("🚀 开始MBTI讨论流程")
+            self.logger.info("🚀 开始DyCo讨论流程")
             self.logger.debug(f"任务: {task}")
             self.logger.info(f"初始智能体: {initial_agent_id}")
             self.logger.debug("="*80)
@@ -392,7 +393,7 @@ class FourRoundDiscussionWorkflow:
                 result['error_message'] = error_msg
                 raise ValueError(error_msg)
             
-            self.logger.info(f"{logger_prefix} ✓ 智能体验证成功: {agent.agent_name} (MBTI: {agent.mbti_type})")
+            self.logger.info(f"{logger_prefix} ✓ 智能体验证成功: {agent.agent_name} (角色先验(MBTI测试床): {agent.mbti_type})")
             
             # ========== 2. 创建初始团队 ==========
             self.logger.debug(f"{logger_prefix} 步骤2: 创建初始团队（成员: {agent_id}）...")
@@ -1249,8 +1250,8 @@ class FourRoundDiscussionWorkflow:
             affinity_summary = self._format_affinity_matrix_summary(symmetric_affinity, agent_ids)
             self.logger.debug(f"亲和度矩阵构建完成:\n{affinity_summary}")
             
-            # ========== 步骤2: 执行贪心聚类算法 ==========
-            self.logger.debug(f"【步骤2】执行贪心聚类算法，目标团队数={n_teams}...")
+            # ========== 步骤2: 执行谱聚类算法 ==========
+            self.logger.debug(f"【步骤2】执行谱聚类算法，目标团队数={n_teams}...")
             
             teams_list = self.clustering(symmetric_affinity, agent_ids, n_teams)
             
@@ -1287,7 +1288,7 @@ class FourRoundDiscussionWorkflow:
                 'success': True,
                 'teams': teams,
                 'team_count': len(teams),
-                'clustering_method': 'greedy_affinity_clustering',
+                'clustering_method': 'spectral_clustering',
                 'clustering_summary': clustering_summary,
                 'affinity_matrix_summary': affinity_summary,
                 'timestamp': datetime.now().isoformat(),
@@ -1306,7 +1307,7 @@ class FourRoundDiscussionWorkflow:
                 'success': False,
                 'teams': {},
                 'team_count': 0,
-                'clustering_method': 'greedy_affinity_clustering',
+                'clustering_method': 'spectral_clustering',
                 'clustering_summary': '',
                 'affinity_matrix_summary': '',
                 'timestamp': datetime.now().isoformat(),
@@ -1320,8 +1321,7 @@ class FourRoundDiscussionWorkflow:
         n_teams: int
     ) -> List[List[str]]:
         """
-        聚类分组。
-        
+        聚类分组（谱聚类）。
         """
         n_agents = len(agent_ids)
         
@@ -1330,40 +1330,83 @@ class FourRoundDiscussionWorkflow:
         
         if n_teams <= 0:
             n_teams = 1
-        
-        agent_pairs = []
-        for i, agent1 in enumerate(agent_ids):
-            for j, agent2 in enumerate(agent_ids):
-                if i < j:  
-                    affinity = affinity_matrix[agent1][agent2]
-                    agent_pairs.append((affinity, agent1, agent2))
-        
-        agent_pairs.sort(reverse=True, key=lambda x: x[0])
-        
-        agent_to_team = {agent_id: idx for idx, agent_id in enumerate(agent_ids)}
-        teams = [[agent_id] for agent_id in agent_ids]
-        
-        current_team_count = len(teams)
-        
-        for affinity, agent1, agent2 in agent_pairs:
-            if current_team_count <= n_teams:
-                break  
-            
-            team1_idx = agent_to_team[agent1]
-            team2_idx = agent_to_team[agent2]
-            
-            if team1_idx == team2_idx:
-                continue  
-            
-            for agent_id in teams[team2_idx]:
-                teams[team1_idx].append(agent_id)
-                agent_to_team[agent_id] = team1_idx
-            
-            teams[team2_idx] = []  
-            current_team_count -= 1
-        final_teams = [team for team in teams if team]
-        
-        return final_teams
+
+        if n_teams == 1:
+            return [list(agent_ids)]
+
+        index_map = {agent_id: idx for idx, agent_id in enumerate(agent_ids)}
+        w = np.zeros((n_agents, n_agents), dtype=float)
+        for agent1, neighbors in affinity_matrix.items():
+            i = index_map.get(agent1)
+            if i is None:
+                continue
+            for agent2, affinity in neighbors.items():
+                j = index_map.get(agent2)
+                if j is None:
+                    continue
+                w[i, j] = float(affinity)
+
+        w = (w + w.T) / 2.0
+
+        degrees = w.sum(axis=1)
+        if np.allclose(degrees, 0):
+            teams = [[] for _ in range(n_teams)]
+            for idx, agent_id in enumerate(agent_ids):
+                teams[idx % n_teams].append(agent_id)
+            return [team for team in teams if team]
+
+        inv_sqrt_deg = np.zeros_like(degrees)
+        non_zero = degrees > 0
+        inv_sqrt_deg[non_zero] = 1.0 / np.sqrt(degrees[non_zero])
+        d_inv_sqrt = np.diag(inv_sqrt_deg)
+
+        laplacian = np.eye(n_agents) - d_inv_sqrt @ w @ d_inv_sqrt
+        _, eigenvectors = np.linalg.eigh(laplacian)
+        embedding = eigenvectors[:, :n_teams]
+
+        row_norms = np.linalg.norm(embedding, axis=1, keepdims=True)
+        row_norms[row_norms == 0] = 1.0
+        embedding = embedding / row_norms
+
+        def _kmeans(data: np.ndarray, k: int, max_iter: int = 100) -> np.ndarray:
+            n_samples = data.shape[0]
+            norms = np.linalg.norm(data, axis=1)
+            first_idx = int(np.argmax(norms))
+            centroids = [data[first_idx]]
+
+            for _ in range(1, k):
+                dist_sq = np.full(n_samples, np.inf)
+                for center in centroids:
+                    diff = data - center
+                    dist_sq = np.minimum(dist_sq, np.einsum('ij,ij->i', diff, diff))
+                next_idx = int(np.argmax(dist_sq))
+                centroids.append(data[next_idx])
+
+            centroids = np.vstack(centroids)
+            labels = np.zeros(n_samples, dtype=int)
+
+            for _ in range(max_iter):
+                distances = np.linalg.norm(data[:, None, :] - centroids[None, :, :], axis=2)
+                new_labels = np.argmin(distances, axis=1)
+                if np.array_equal(new_labels, labels):
+                    break
+                labels = new_labels
+                for i in range(k):
+                    members = data[labels == i]
+                    if members.size == 0:
+                        farthest_idx = int(np.argmax(np.min(distances, axis=1)))
+                        labels[farthest_idx] = i
+                        members = data[labels == i]
+                    centroids[i] = members.mean(axis=0)
+
+            return labels
+
+        labels = _kmeans(embedding, n_teams)
+        teams = [[] for _ in range(n_teams)]
+        for agent_id, label in zip(agent_ids, labels):
+            teams[int(label)].append(agent_id)
+
+        return [team for team in teams if team]
     
     def _format_affinity_matrix_summary(
         self, 
@@ -1833,7 +1876,7 @@ class FourRoundDiscussionWorkflow:
                 for listener in selected_listeners:
                     try:
                         # 调用 attitude 函数（返回字典）
-                        attitude_result = listener.attitude(task, message, round_index, max_rounds)
+                        attitude_result = listener.attitude_eva(task, message, round_index, max_rounds)
                         
                         if not attitude_result.get('success', False):
                             self.logger.warning(f"      ⚠️ {listener.agent_id} 态度分析失败")

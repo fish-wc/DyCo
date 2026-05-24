@@ -306,7 +306,7 @@ def build_knowledge_with_meta(knowledge_content: str, agent_id: str, mbti_type: 
     Args:
         knowledge_content: 核心知识内容（纯文本，不含XML标签）
         agent_id: 智能体ID
-        mbti_type: MBTI 类型
+        mbti_type: 角色先验标签(MBTI测试床)
         task_id: 任务ID（可选）
         knowledge_type: 知识类型（如 'analysis', 'discussion', 'conclusion'）
         importance: 重要性（high/medium/low）

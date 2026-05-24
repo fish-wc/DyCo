@@ -74,7 +74,7 @@ class BaseAgent(ABC):
         # 日志记录器（使用传入的logger或获取默认logger）
         self.logger = logger or logging.getLogger(f"agent.{self.agent_id}")
         
-        self.logger.info(f"初始化智能体: {self.agent_id} ({self.agent_name})。MBTI类型: {self.mbti_type}。")
+        self.logger.info(f"初始化智能体: {self.agent_id} ({self.agent_name})。角色先验(MBTI测试床): {self.mbti_type}。")
         
         # 通信组件 TODO 消息队列可以考虑从agent里面去掉
         self.message_manager = message_manager
@@ -209,7 +209,7 @@ class BaseAgent(ABC):
         执行流程：
         1. 调用 LLMToolClient 获取结构化分析结果（XML 格式）
         2. 解析 XML 提取多个知识点
-        3. 为每个知识点添加 meta 信息（智能体ID、MBTI类型等）
+        3. 为每个知识点添加 meta 信息（智能体ID、角色先验标签等）
         4. 使用 add_knowledge_tool 将知识存入向量数据库
         
         Args:
@@ -324,7 +324,7 @@ class BaseAgent(ABC):
                 # 构建完整的任务分析报告
                 report_parts = [f"【任务分析报告 - {self.agent_id}】\n"]
                 report_parts.append(f"分析时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                report_parts.append(f"MBTI类型: {self.mbti_type}")
+                report_parts.append(f"角色先验(MBTI测试床): {self.mbti_type}")
                 report_parts.append(f"分析维度: {len(knowledge_points)} 个\n")
                 
                 for idx, kp in enumerate(knowledge_points, 1):
@@ -438,7 +438,7 @@ class BaseAgent(ABC):
         执行流程：
         1. 调用 LLMToolClient 获取结构化评审结果（XML 格式）
         2. 解析 XML 提取评审决策和多个评价点
-        3. 为每个评价点添加 meta 信息（智能体ID、MBTI类型等）
+        3. 为每个评价点添加 meta 信息（智能体ID、角色先验标签等）
         4. 使用 add_knowledge_tool 将评审知识存入向量数据库
         
         Args:
@@ -562,7 +562,7 @@ class BaseAgent(ABC):
                 # 构建完整的方案评审报告
                 report_parts = [f"【方案评审报告 - {self.agent_id}】\n"]
                 report_parts.append(f"评审时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                report_parts.append(f"MBTI类型: {self.mbti_type}")
+                report_parts.append(f"角色先验(MBTI测试床): {self.mbti_type}")
                 report_parts.append(f"评审决策: {decision.get('approval_status', '未知')}")
                 report_parts.append(f"信心程度: {decision.get('confidence_level', 0)}")
                 report_parts.append(f"评价维度: {len(evaluation_points)} 个\n")
@@ -924,7 +924,7 @@ class BaseAgent(ABC):
                 # 构建完整的组队策略报告
                 report_parts = [f"【组队策略报告 - {self.agent_id}】\n"]
                 report_parts.append(f"评估时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                report_parts.append(f"MBTI类型: {self.mbti_type}")
+                report_parts.append(f"角色先验(MBTI测试床): {self.mbti_type}")
                 report_parts.append(f"候选人数: {len(result['candidates'])} 人")
                 report_parts.append(f"任务描述: {task[:200]}...\n")
                 
@@ -1719,7 +1719,7 @@ class BaseAgent(ABC):
                 # 构建完整的生成内容报告
                 report_parts = [f"【生成内容报告 - {self.agent_id}】\n"]
                 report_parts.append(f"生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                report_parts.append(f"MBTI类型: {self.mbti_type}")
+                report_parts.append(f"角色先验(MBTI测试床): {self.mbti_type}")
                 report_parts.append(f"轮次: 第 {round_index}/{max_rounds} 轮" if round_index and max_rounds else "轮次: 未知")
                 report_parts.append(f"知识点数量: {len(knowledge_points)} 个\n")
                 
@@ -1868,7 +1868,7 @@ class BaseAgent(ABC):
             self.logger.error(f"❌ 沟通对话时出错: {e}", exc_info=True)
             return "【沟通对话失败】"
 
-    def attitude(self, task: str = None, message: Message = None, 
+    def attitude_eva(self, task: str = None, message: Message = None, 
                  round_index=None, max_rounds=None) -> Dict[str, Any]:
         """
         智能体态度分析 - 在听取其他智能体发言时的思考动作，用于 EVA 探索-验证交替与发言意愿更新。
@@ -2028,7 +2028,7 @@ class BaseAgent(ABC):
                     # 构建完整的态度分析报告
                     report_parts = [f"【态度分析报告 - {self.agent_id}】\n"]
                     report_parts.append(f"分析时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-                    report_parts.append(f"MBTI类型: {self.mbti_type}")
+                    report_parts.append(f"角色先验(MBTI测试床): {self.mbti_type}")
                     report_parts.append(f"轮次: {round_index}/{max_rounds}" if round_index and max_rounds else "轮次: 未知")
                     report_parts.append(f"消息发送者: {message.sender_id if message else '无'}\n")
                     

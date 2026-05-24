@@ -33,7 +33,7 @@ class KnowledgeConfig(BaseModel):
 
 class PersonalityConfig(BaseModel):
     """性格配置"""
-    mbti_type: Optional[str] = Field(None, description="MBTI类型")
+    mbti_type: Optional[str] = Field(None, description="角色先验标签(MBTI测试床)")
     speaking_threshold: float = Field(default=6.0, ge=0.0, le=10.0, description="发言阈值(0-10分)")
 
 
@@ -41,7 +41,7 @@ class AgentConfig(BaseModel):
     """智能体配置"""
     agent_id: str = Field(..., description="智能体ID")
     agent_name: str = Field(..., description="智能体名称")
-    mbti_type: str = Field(..., description="MBTI类型")
+    mbti_type: str = Field(..., description="角色先验标签(MBTI测试床)")
     
     # 模型配置
     model: ModelConfig = Field(..., description="大模型配置")

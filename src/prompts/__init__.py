@@ -51,7 +51,7 @@ class PromptLoader:
         加载性格核心提示词
         
         Args:
-            mbti_type: MBTI 类型 (如 'intj', 'infj')
+            mbti_type: 角色先验标签(以 MBTI 为例, 如 'intj', 'infj')
             use_cache: 是否使用缓存
             
         Returns:
@@ -79,7 +79,7 @@ class PromptLoader:
         加载功能提示词
         
         Args:
-            mbti_type: MBTI 类型 (如 'intj', 'infj')
+            mbti_type: 角色先验标签(以 MBTI 为例, 如 'intj', 'infj')
             function_name: 功能名称 (如 'evaluate_solution', 'analyze_task')
             use_cache: 是否使用缓存
             
@@ -114,7 +114,7 @@ class PromptLoader:
         组合性格提示词和功能提示词
         
         Args:
-            mbti_type: MBTI 类型
+            mbti_type: 角色先验标签(以 MBTI 为例)
             function_name: 功能名称
             shared_template: 可选的共享模板名称
             use_cache: 是否使用缓存
