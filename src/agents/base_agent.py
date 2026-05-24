@@ -1,6 +1,6 @@
 """
 智能体基类
-所有MBTI智能体的基类,提供通用功能
+面向 DyCo 角色先验的通用实现，MBTI 仅作为可解释测试床
 """
 import re
 import json
@@ -204,7 +204,7 @@ class BaseAgent(ABC):
 
     def analyze_task(self, task: str) -> str:
         """
-        分析任务 - 基于 MBTI 特质的结构化分析，输出 XML 格式并存入知识库
+        分析任务 - 基于角色先验的结构化分析（MBTI 仅作可解释测试床），输出 XML 格式并存入知识库
         
         执行流程：
         1. 调用 LLMToolClient 获取结构化分析结果（XML 格式）
@@ -433,7 +433,7 @@ class BaseAgent(ABC):
 
     def evaluate_solution(self, task: str, solution: str) -> Dict[str, Any]:
         """
-        评估解决方案 - 基于 MBTI 特质的结构化评审，输出 XML 格式并存入知识库
+        评估解决方案 - 基于角色先验的结构化评审（MBTI 仅作可解释测试床），输出 XML 格式并存入知识库
         
         执行流程：
         1. 调用 LLMToolClient 获取结构化评审结果（XML 格式）
@@ -679,8 +679,8 @@ class BaseAgent(ABC):
 
     def get_personality_prompt(self) -> str:
         """
-        获取性格提示词
-        每个MBTI智能体需要实现自己的性格描述
+        获取角色先验提示词
+        每个智能体提供自己的角色先验描述（MBTI 仅作可解释测试床）
         
         Returns:
             性格提示词
@@ -689,7 +689,7 @@ class BaseAgent(ABC):
 
     def decide_team_preference(self, agents: List, task: str, analyses: Dict[str, Any]) -> Dict[str, Any]:
         """
-        MBTI 的组队偏好 - 基于第一轮讨论内容，从多个维度评估队友，给出组队意愿
+        组队偏好(动态组队) - 基于第一轮讨论内容评估队友并给出意愿，MBTI 仅作角色先验测试床
         
         执行流程：
         1. 整理其他智能体的任务分析结果
@@ -1402,7 +1402,7 @@ class BaseAgent(ABC):
                         max_rounds = None
                         ) -> Dict[str, Any]:
         """
-        生成解决方案 - 基于 MBTI 特质的结构化生成，输出 XML 格式并存入知识库
+        生成解决方案 - 基于角色先验的结构化生成（MBTI 仅作可解释测试床），输出 XML 格式并存入知识库
         
         执行流程：
         1. 从知识库检索相关历史知识（混合策略：任务+意图检索 + 最近消息）
@@ -1871,7 +1871,7 @@ class BaseAgent(ABC):
     def attitude(self, task: str = None, message: Message = None, 
                  round_index=None, max_rounds=None) -> Dict[str, Any]:
         """
-        智能体态度分析 - 在听取其他智能体发言时的思考动作。基于attitude函数来实现EVA机制。
+        智能体态度分析 - 在听取其他智能体发言时的思考动作，用于 EVA 探索-验证交替与发言意愿更新。
         
         分析内容：
         1. 讨论完善度评估：当前方案是否完善、关键问题、共识状态

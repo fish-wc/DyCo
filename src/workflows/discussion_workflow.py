@@ -1,5 +1,5 @@
 """
-工作流模块 - 实现4轮讨论流程
+工作流模块 - 实现含评测与动态组队的四轮讨论流程
 """
 from typing import List, Dict, Any, Optional, Set
 import json
@@ -21,7 +21,7 @@ from ..utils.helpers import get_tag_content
 from src.utils.discussion_summary_manager import DiscussionSummaryManager
 
 class FourRoundDiscussionWorkflow:
-    """四轮讨论工作流"""
+    """四轮讨论工作流（含评测、组队与代表讨论阶段）"""
     
     def __init__(self, 
                  agents: List[BaseAgent],

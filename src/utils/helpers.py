@@ -415,9 +415,9 @@ def parse_evaluation_result(text: str) -> dict:
 
 def parse_team_preference_result(text: str) -> dict:
     """
-    从 LLM 输出中解析组队偏好结果（支持多种 MBTI 类型的不同评估维度）
+    从 LLM 输出中解析组队偏好结果（支持多种角色先验维度，MBTI 仅作测试床）
     
-    支持的 MBTI 评估维度:
+    支持的角色先验评估维度（以 MBTI 作为测试床）:
     - ENFJ: COLLABORATION_POTENTIAL, CAPABILITY_COMPLEMENT, COMMUNICATION_FIT, GROWTH_VALUE (30%, 30%, 20%, 20%)
     - ENFP: INNOVATION_POTENTIAL, TASK_ALIGNMENT, ANALYTICAL_PERSPECTIVE, COLLABORATION_FIT (35%, 25%, 25%, 15%)
     - ENTJ: STRATEGIC_CONTRIBUTION, PROFESSIONAL_CAPABILITY, EXECUTION_POWER, SYSTEM_COMPATIBILITY (40%, 30%, 20%, 10%)
@@ -447,7 +447,7 @@ def parse_team_preference_result(text: str) -> dict:
         '谨慎考虑': 4.5, '不推荐': 2.0
     }
     
-    # 不同MBTI类型的评估维度配置 (标签名, 权重, 输出字段名)
+    # 不同角色先验(以 MBTI 作为测试床)的评估维度配置 (标签名, 权重, 输出字段名)
     DIMENSION_CONFIGS = {
         # ENFJ 维度
         'COLLABORATION_POTENTIAL': ('collaboration_potential', 0.3),

@@ -9,7 +9,7 @@ from enum import Enum
 
 class MessageType(str, Enum):
     """消息类型"""
-    EVALUATION = "evaluation"  # 评判。第一个阶段，测评第一个agent来发言的阶段。
+    EVALUATION = "evaluation"  # 评判/验证阶段，用于初始方案评测
     DISCUSSION = "discussion"  # 讨论发言
     TEAM_FORMATION = "team_formation"  # 组队意向
     SOLUTION = "solution"  # 解决方案

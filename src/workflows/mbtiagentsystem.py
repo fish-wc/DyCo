@@ -1,5 +1,6 @@
 '''
-定义 MBTI 智能体系统的主要类，对discussion_workflow进行封装，部分参数设定默认参数，以便于使用。
+定义 DyCo 智能体系统入口，封装 discussion_workflow 并提供默认参数。
+MBTI 仅作为可解释的角色先验测试床。
 '''
 import os
 import logging
@@ -19,7 +20,7 @@ from src.tools.system.knowledgemanager import init_knowledge_manager
 from src.utils.llm_client import create_llm_client
 
 class MBTIAgentSystem:
-    """MBTI 智能体系统入口"""
+    """DyCo 智能体系统入口（MBTI 作为角色先验测试床）"""
 
     def __init__(
         self,
@@ -30,7 +31,7 @@ class MBTIAgentSystem:
         reuse_global_loader: bool = False,
     ) -> None:
         """初始化系统组件并加载智能体"""
-        self.model_name = "MBTI_MAS" # 这里默认是MBTI_MAS，基于 task_id 创建独立知识库路径
+        self.model_name = "MBTI_MAS" # 默认模型名，基于 task_id 创建独立知识库路径
         self.config_loader = self._init_config_loader(config_dir, reuse_global_loader)
         self.system_config = self.config_loader.load_system_config()
 
