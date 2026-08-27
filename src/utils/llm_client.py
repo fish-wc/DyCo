@@ -8,7 +8,15 @@ load_dotenv(find_dotenv())
 from typing import Any, Optional
 
 from openai import OpenAI
-from zai import ZhipuAiClient
+try:
+    from zai import ZhipuAiClient
+except ImportError:
+    try:
+        # 部分版本的 zai-sdk 未在顶层导出 ZhipuAiClient
+        from zai._client import ZhipuAiClient
+    except ImportError:
+        class ZhipuAiClient:  # zai-sdk 未安装时的占位，保证 isinstance 检查不报错
+            pass
 import requests
 import numpy as np
 

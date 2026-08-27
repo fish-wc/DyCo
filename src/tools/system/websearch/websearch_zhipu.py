@@ -11,7 +11,14 @@ sys.path.append(str(work_dir))
 
 from typing import Optional, Dict, Any, Literal
 from dotenv import load_dotenv, find_dotenv
-from zai import ZhipuAiClient
+try:
+    from zai import ZhipuAiClient
+except ImportError:
+    try:
+        # 部分版本的 zai-sdk 未在顶层导出 ZhipuAiClient
+        from zai._client import ZhipuAiClient
+    except ImportError:
+        ZhipuAiClient = None
 from smolagents import tool
 from src.prompts import prompt_loader
 
@@ -30,9 +37,11 @@ class WebSearchManager:
             api_key: 智谱AI的API密钥,如果为None则从环境变量ZHIPU_API_KEY读取
             logger: 日志记录器
         """
-        self.api_key = api_key or os.getenv("ZHIMU_API_KEY")
+        self.api_key = api_key or os.getenv("ZHIPU_API_KEY")
         if not self.api_key:
             raise ValueError("未找到智谱AI的API密钥,请设置环境变量ZHIPU_API_KEY或传入api_key参数")
+        if ZhipuAiClient is None:
+            raise ImportError("需要安装 zai-sdk 才能使用智谱 websearch: pip install zai-sdk")
         
         self.client = ZhipuAiClient(api_key=self.api_key)
         

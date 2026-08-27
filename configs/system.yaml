@@ -1,0 +1,59 @@
+# ============================================================================ #
+# DyCo 系统级配置
+#
+# 注意：model / embedding 块中的 `api_key` 与 `model_url` 填写的是【环境变量名】，
+#       而不是真实值。运行期由 src/utils/llm_client.py 通过 os.getenv() 解析。
+#       请复制 .env.example 为 .env 并填入真实密钥。
+# ============================================================================ #
+
+# 工作空间：消息、知识库、日志等运行期产物都写到这里（已加入 .gitignore）
+workspace_root: workspace
+
+# 消息存储类型与日志级别
+message_storage_type: json
+log_level: INFO
+
+# ---- 讨论流程参数（论文 §Experimental Setup / 附录 H）----------------------- #
+max_rounds: 8                      # 每个团队内最大讨论轮数 (T_max = 8)
+max_final_discussion_rounds: 5     # 代表层协商最大轮数
+max_concurrent_agents: 4
+max_evaluation_agents: 4
+collate_memory_window: 10
+attitude_memory_window: 2
+web_search_count: 5                # 每次检索返回 top-5 段落（JINA）
+num_listeners_sampled_per_round: 1 # 每轮抽样评估共识的听众数量
+
+# ---- 主模型（论文主实验：GPT-4o-mini, temperature 0.7）---------------------- #
+model:
+  model_name: gpt-4o-mini-2024-07-18
+  model_url: OPENAI_BASE_URL        # 环境变量名：OpenAI 兼容 API 的 base url
+  api_key: OPENAI_API_KEY           # 环境变量名：API 密钥
+  temperature: 0.7
+  timeout: 120
+
+# ---- Embedding 模型（知识库向量化，默认 text-embedding-3-small）------------- #
+embedding:
+  model_name: text-embedding-3-small
+  model_url: OPENAI_EMBEDDING_MODEL_URL  # 环境变量名
+  api_key: OPENAI_EMBEDDING_API_KEY      # 环境变量名
+  dimension: 1536
+
+# ---- Collate 模型（最终报告整理；缺省时回退到主模型）------------------------ #
+# collate_model:
+#   model_name: gpt-4o-mini-2024-07-18
+#   model_url: OPENAI_BASE_URL
+#   api_key: OPENAI_API_KEY
+#   temperature: 0.7
+
+# ---- 默认组队 ---------------------------------------------------------------- #
+# DyCo-Diverse（论文主结果配置）：ENTJ + INTJ + ESTP + ISFJ
+# 对应配置文件在 configs/agents/ 下；换成其他组合即可复现同质配置（如 4xINFJ）。
+agents:
+  - agent_id: entj_001
+    config_file: agents/entj_001.yaml
+  - agent_id: intj_001
+    config_file: agents/intj_001.yaml
+  - agent_id: estp_001
+    config_file: agents/estp_001.yaml
+  - agent_id: isfj_001
+    config_file: agents/isfj_001.yaml

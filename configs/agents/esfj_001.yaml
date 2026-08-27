@@ -1,0 +1,28 @@
+# Agent: DyCo 角色先验测试床 (MBTI)
+# 角色提示词位于 src/prompts/mbti/esfj/
+agent_id: esfj_001
+agent_name: ESFJ Agent
+mbti_type: esfj
+
+# 模型：缺省继承 system.yaml 的主模型；如需为单个 agent 指定模型，在此覆盖。
+# model:
+#   model_name: gpt-4o-mini-2024-07-18
+#   model_url: OPENAI_BASE_URL
+#   api_key: OPENAI_API_KEY
+#   temperature: 0.7
+
+# 角色先验与发言意愿
+personality:
+  mbti_type: esfj
+  speaking_threshold: 6.0   # 发言阈值 (0-10)
+
+# 知识库路径（task_id 维度的隔离由 KnowledgeManager 自动处理）
+knowledge:
+  private_kb_path: workspace/knowledge/private
+  shared_kb_path: workspace/knowledge/shared
+  vector_store_type: faiss
+  embedding_model: text-embedding-3-small
+
+max_memory_items: 100
+workspace_path: workspace
+memory_window_size: 6

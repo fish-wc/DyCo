@@ -1,0 +1,37 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+cff-version: 1.2.0
+title: "DyCo: Dynamic Cognitive Role Coordination for Open-Ended Multi-Agent Research Synthesis and Verification"
+message: >-
+  If you use this software or build on the DyCo framework, please cite it
+  using the metadata in this file.
+type: software
+authors:
+  - family-names: Zhang
+    given-names: Zhiyu
+    affiliation: Huazhong University of Science and Technology
+  - family-names: Wu
+    given-names: Leheng
+    affiliation: Huazhong University of Science and Technology
+  - family-names: Mo
+    given-names: Yijun
+    affiliation: Huazhong University of Science and Technology
+  - family-names: Zhong
+    given-names: Mingchu
+    affiliation: Wuhan University of Technology
+  - family-names: Zhang
+    given-names: Yulin
+    affiliation: Huazhong University of Science and Technology
+  - family-names: Xi
+    given-names: Chen
+    affiliation: Nanyang Technological University
+repository-code: "https://github.com/YOUR_USERNAME/DyCo"
+date-released: "2026-08-27"
+# TODO: Add the DOI of the archived code release after publishing it.
+keywords:
+  - multi-agent systems
+  - large language models
+  - research synthesis
+  - cognitive role coordination
+  - LLM agents
+license: MIT

@@ -1,0 +1,40 @@
+# ===== 密钥与本地配置 =====
+.env
+*.env
+
+# ===== 论文（内部资料，不随仓库发布）===== #
+paper/
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+*.egg
+
+# ===== 虚拟环境 =====
+.venv/
+venv/
+env/
+
+# ===== 运行期产物 =====
+workspace/
+logs/
+MBTI_MAS/
+*.log
+
+# ===== IDE / 系统 =====
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ===== 临时文件 =====
+*.tmp
+*.bak
